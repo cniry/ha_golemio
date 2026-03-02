@@ -42,8 +42,10 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
             if "last_measurement" in container:
                 entities.append(GolemSensor(hass, name, i, container, token, containerid, "next_pick", "Next Pick"))
                 entities.append(GolemSensor(hass, name, i, container, token, containerid, "percent_calculated", "Percent Calculated"))
+                entities.append(GolemSensor(hass, name, i, container, token, containerid, "pick_days", "Pick Days"))
             elif "cleaning_frequency" in container and "next_pick" in container["cleaning_frequency"]:
                 entities.append(GolemSensor(hass, name, i, container, token, containerid, "next_pick", "Next Pick"))
+                entities.append(GolemSensor(hass, name, i, container, token, containerid, "pick_days", "Pick Days"))
     
     # Přidání vytvořených senzorů do entitního systému Home Assistant
     add_entities(entities)
@@ -90,6 +92,8 @@ class GolemSensor(SensorEntity):
     def icon(self):
         if self._data_key == "next_pick":
             return "mdi:home-clock" 
+        elif self._data_key == "pick_days":
+            return "mdi:calendar-clock"
         elif self._data_key == "percent_calculated":
             return "mdi:percent"
 
@@ -102,7 +106,11 @@ class GolemSensor(SensorEntity):
     def name(self):
         if self._data_key == "next_pick":
             description = self._container["trash_type"].get("description", "Unknown Trash")
-            data_name = "datum odvozu"
+            data_name = "příští datum odvozu"
+            return f"{self._name} {self._index} {description} {data_name}"
+        elif self._data_key == "pick_days":
+            description = self._container["trash_type"].get("description", "Unknown Trash")
+            data_name = "dny odvozu"
             return f"{self._name} {self._index} {description} {data_name}"
         elif self._data_key == "percent_calculated":
             data_name = "volná kapacita"
@@ -117,7 +125,11 @@ class GolemSensor(SensorEntity):
     def friendly_name(self):
         if self._data_key == "next_pick":
             description = self._container["trash_type"].get("description", "Unknown Trash")
-            data_name = "datum odvozu"
+            data_name = "příští datum odvozu"
+            return f"{self._name} {self._index} {description} {data_name} {self._index}"
+        elif self._data_key == "pick_days":
+            description = self._container["trash_type"].get("description", "Unknown Trash")
+            data_name = "dny odvozu"
             return f"{self._name} {self._index} {description} {data_name} {self._index}"
         elif self._data_key == "percent_calculated":
             data_name = "volná kapacita"
@@ -132,6 +144,9 @@ class GolemSensor(SensorEntity):
     def native_value(self):
         if self._data_key == "next_pick":
             # Vrátí hodnotu klíče "next_pick" nebo "n/a" pokud neexistuje
+            return self._container["cleaning_frequency"].get(self._data_key, "n/a")
+        elif self._data_key == "pick_days":
+            # Vrátí hodnotu klíče "pick_days" nebo "n/a" pokud neexistuje
             return self._container["cleaning_frequency"].get(self._data_key, "n/a")
         elif self._data_key == "percent_calculated":
             # Vrátí hodnotu klíče "percent_calculated" nebo "n/a" pokud neexistuje
