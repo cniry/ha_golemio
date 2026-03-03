@@ -1,11 +1,11 @@
 {
 	"domain": "golemio",
 	"name": "Golemio",
-	"codeowners": [ "@cmajda" ],
+	"codeowners": [ "@cniry", "@cmajda" ],
 	"dependencies": [],
-	"documentation": "https://github.com/Cmajda/ha_golemio",
+	"documentation": "https://github.com/cniry/ha_golemio",
 	"iot_class": "cloud_polling",
-	"issue_tracker": "https://github.com/Cmajda/ha_golemio/issues",
+	"issue_tracker": "https://github.com/cniry/ha_golemio/issues",
 	"requirements": [],
 	"version": "1.2.0"
 }
