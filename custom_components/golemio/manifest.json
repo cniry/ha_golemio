@@ -1,6 +1,7 @@
 {
 	"domain": "golemio",
 	"name": "Golemio",
+	"config_flow": true,
 	"codeowners": [ "@cniry", "@cmajda" ],
 	"dependencies": [],
 	"documentation": "https://github.com/cniry/ha_golemio",
