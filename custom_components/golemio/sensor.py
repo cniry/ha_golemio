@@ -5,7 +5,6 @@ from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.const import CONF_NAME, CONF_TOKEN
 from homeassistant.util import Throttle
 from homeassistant.config_entries import ConfigEntry
-import asyncio
 from ratelimit import limits, sleep_and_retry
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
@@ -16,7 +15,6 @@ _LOGGER = logging.getLogger(__name__)
 
 # Definice konstant a nastavení platformy
 DOMAIN = "golemio"
-CONF_NAME = "name"
 CONF_CONTAINERID = "container_id"
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
@@ -76,7 +74,7 @@ async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
     async_add_entities(entities)
 
 # Funkce pro získání dat z API
-@sleep_an_dretry
+@sleep_and_retry
 @limits(calls=20, period=10)  # Omezení na 20 volání za 10 sekund
 def call_api_get(token, containerid):
     api_headers = {
