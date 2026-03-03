@@ -1,12 +1,12 @@
 {
-	"domain": "golemio",
-	"name": "Golemio",
-	"config_flow": true,
 	"codeowners": [ "@cniry", "@cmajda" ],
+	"config_flow": true,
 	"dependencies": [],
 	"documentation": "https://github.com/cniry/ha_golemio",
+	"domain": "golemio",
 	"iot_class": "cloud_polling",
 	"issue_tracker": "https://github.com/cniry/ha_golemio/issues",
+	"name": "Golemio",
 	"requirements": [],
 	"version": "1.2.0"
 }
