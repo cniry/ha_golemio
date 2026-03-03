@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint_and_tests:
+    name: Lint and Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+          pip install pytest
+          pip install pytest-homeassistant-custom-component
+
+      - name: Run ruff (lint)
+        run: |
+          ruff check .
+
+      - name: Check Python syntax
+        run: |
+          python -m compileall .
+
+      - name: Run tests if present
+        run: |
+          if [ -d tests ]; then
+            pytest -q
+          else
+            echo "No tests found, skipping pytest"
+          fi

@@ -4,6 +4,7 @@ from datetime import timedelta
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.const import CONF_NAME, CONF_TOKEN
 from homeassistant.util import Throttle
+from homeassistant.config_entries import ConfigEntry
 from ratelimit import limits, sleep_and_retry
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
@@ -14,7 +15,6 @@ _LOGGER = logging.getLogger(__name__)
 
 # Definice konstant a nastavení platformy
 DOMAIN = "golemio"
-CONF_NAME = "name"
 CONF_CONTAINERID = "container_id"
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
@@ -49,6 +49,29 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     
     # Přidání vytvořených senzorů do entitního systému Home Assistant
     add_entities(entities)
+
+
+async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
+    """Set up sensors from a config entry created in the UI."""
+    name = entry.data.get(CONF_NAME)
+    token = entry.data.get(CONF_TOKEN)
+    containerid = entry.data.get(CONF_CONTAINERID)
+
+    # Run blocking API call in executor
+    response_data = await hass.async_add_executor_job(call_api_get, token, containerid)
+    entities = []
+    if response_data:
+        containers = response_data["features"][0]["properties"]["containers"]
+        for i, container in enumerate(containers):
+            if "last_measurement" in container:
+                entities.append(GolemSensor(hass, name, i, container, token, containerid, "next_pick", "Next Pick"))
+                entities.append(GolemSensor(hass, name, i, container, token, containerid, "percent_calculated", "Percent Calculated"))
+                entities.append(GolemSensor(hass, name, i, container, token, containerid, "pick_days", "Pick Days"))
+            elif "cleaning_frequency" in container and "next_pick" in container["cleaning_frequency"]:
+                entities.append(GolemSensor(hass, name, i, container, token, containerid, "next_pick", "Next Pick"))
+                entities.append(GolemSensor(hass, name, i, container, token, containerid, "pick_days", "Pick Days"))
+
+    async_add_entities(entities)
 
 # Funkce pro získání dat z API
 @sleep_and_retry
