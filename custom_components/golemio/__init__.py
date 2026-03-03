@@ -7,9 +7,13 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import CONF_TOKEN, CONF_NAME
+from homeassistant.helpers import config_validation as cv
 
 DOMAIN = "golemio"
 CONF_CONTAINERID = "container_id"
+
+# schema since integration can only be set up via config entries
+CONFIG_SCHEMA = cv.config_entry_only_config_schema
 _LOGGER = logging.getLogger(__name__)
 
 
